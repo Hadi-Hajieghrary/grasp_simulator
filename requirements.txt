@@ -1,0 +1,31 @@
+git+https://github.com/Hadi-Hajieghrary/tacto.git@main#egg=tacto
+
+numpy >= 1.18.5
+pybullet >= 2.8.1
+matplotlib >= 3.1.3
+opencv-python >= 3.4.2.17
+omegaconf >= 2.0.6
+pyrender >= 0.1.43
+hydra-core >= 1.0.6
+urdfpy >= 0.0.22
+scipy
+
+# Need a specific version of PyOpenGL (forked & modified by mmatl) for pyrender
+# to run headlessly using OSMesa. Otherwise, we will get python ImportError:
+# `cannot import name 'OSMesaCreateContextAttribs'`.
+pyopengl @ git+https://github.com/mmatl/pyopengl.git@76d1261adee2d3fd99b418e75b0416bb7d2865e6
+
+torch
+gym
+pybulletX >= 0.4.1
+
+pre-commit
+black
+flake8
+flake8-copyright
+isort
+nox >= 2019.11.9
+snakeviz >= 2.1.0
+pytest >= 6.0.1
+pytest-cov >= 2.10.1
+pytest-benchmark >= 3.2.3
