@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="ur5_arm">
+
+    <xacro:include filename="$(find bullet_grasp_simulator)/urdf/include/ur5_arm/common.urdf.xacro" />
+    <xacro:include filename="$(find bullet_grasp_simulator)/urdf/include/ur5_arm/ur5.urdf.xacro" />
+    <xacro:include filename="$(find bullet_grasp_simulator)/urdf/include/ur5_arm/ur5.transmission.xacro" />
+    <xacro:include filename="$(find bullet_grasp_simulator)/urdf/include/ur5_arm/ur5.gazebo.xacro" />
+
+
+    <link name="world"/>
+
+    <!-- #################### UR10 Arm ################### -->
+    <!-- ################################################# -->
+
+        <!-- #################### URDF ################### -->
+            
+            <xacro:UR5_arm parent="world"/>
+
+        <!-- #################### URDF ################### -->
+
+        <!-- ############## Transmissions ################ -->
+        
+            <!-- 
+                hw_interface="hardware_interface/PositionJointInterface"
+                hw_interface="hardware_interface/EffortJointInterface" 
+            -->
+            <!-- -->
+                <xacro:UR5_joint_transmission joint="base_to_shoulder_pan" hw_interface="hardware_interface/PositionJointInterface"/>
+                <xacro:UR5_joint_transmission joint="shoulder_pan_to_upper_arm" hw_interface="hardware_interface/PositionJointInterface"/>
+                <xacro:UR5_joint_transmission joint="upper_arm_to_fore_arm" hw_interface="hardware_interface/PositionJointInterface"/>
+                <xacro:UR5_joint_transmission joint="fore_arm_to_wrist_1" hw_interface="hardware_interface/PositionJointInterface"/>
+                <xacro:UR5_joint_transmission joint="wrist_1_to_wrist_2" hw_interface="hardware_interface/PositionJointInterface"/>
+                <xacro:UR5_joint_transmission joint="wrist_2_to_wrist_3" hw_interface="hardware_interface/PositionJointInterface"/>
+            
+        <!-- ############## Transmissions ################ -->
+
+
+        <!-- ############## Gazebo ####################### !-->
+
+            <xacro:UR5_gazebo/>
+
+            <xacro:UR5_ros_controller/>
+         
+        <!-- ############## Gazebo ####################### -->
+
+
+    <!-- ################################################# -->
+    <!-- #################### UR10 Arm ################### -->
+
+</robot>

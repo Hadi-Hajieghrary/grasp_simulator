@@ -1,0 +1,332 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+
+    <!-- ################# Properties ################ -->
+    <!-- ############################################# -->
+
+        <!-- Inertia parameters -->
+        <xacro:property name="ur5_base_mass" value="4.0" />  <!-- This mass might be incorrect -->
+        <xacro:property name="ur5_shoulder_mass" value="3.7000" />
+        <xacro:property name="ur5_upper_arm_mass" value="8.3930" />
+        <xacro:property name="ur5_forearm_mass" value="2.2750" />
+        <xacro:property name="ur5_wrist_1_mass" value="1.2190" />
+        <xacro:property name="ur5_wrist_2_mass" value="1.2190" />
+        <xacro:property name="ur5_wrist_3_mass" value="0.1879" />
+        
+        <xacro:property name="ur5_shoulder_cog" value="0.0 0.00193 -0.02561" />
+        <xacro:property name="ur5_upper_arm_cog" value="0.0 -0.024201 0.2125" />
+        <xacro:property name="ur5_forearm_cog" value="0.0 0.0265 0.11993" />
+        <xacro:property name="ur5_wrist_1_cog" value="0.0 0.110949 0.01634" />
+        <xacro:property name="ur5_wrist_2_cog" value="0.0 0.0018 0.11099" />
+        <xacro:property name="ur5_wrist_3_cog" value="0.0 0.001159 0.0" />
+
+        <!-- Kinematic model -->
+        <!-- Properties from urcontrol.conf -->
+        <!--
+            DH for UR5:
+            a = [0.00000, -0.42500, -0.39225,  0.00000,  0.00000,  0.0000]
+            d = [0.089159,  0.00000,  0.00000,  0.10915,  0.09465,  0.0823]
+            alpha = [ 1.570796327, 0, 0, 1.570796327, -1.570796327, 0 ]
+            q_home_offset = [0, -1.570796327, 0, -1.570796327, 0, 0]
+            joint_direction = [-1, -1, 1, 1, 1, 1]
+            mass = [3.7000, 8.3930, 2.2750, 1.2190, 1.2190, 0.1879]
+            center_of_mass = [ [0, -0.02561, 0.00193], [0.2125, 0, 0.11336], [0.11993, 0.0, 0.0265], [0, -0.0018, 0.01634], [0, 0.0018,0.01634], [0, 0, -0.001159] ]
+        -->
+        <xacro:property name="d1" value="0.089159" />
+        <xacro:property name="a2" value="-0.42500" />
+        <xacro:property name="a3" value="-0.39225" />
+        <xacro:property name="d4" value="0.10915" />
+        <xacro:property name="d5" value="0.09465" />
+        <xacro:property name="d6" value="0.0823" />
+
+        <!-- link lengths used in model -->
+        <xacro:property name="ur5_shoulder_height" value="${d1}" />
+        <xacro:property name="ur5_upper_arm_length" value="${-a2}" />
+        <xacro:property name="ur5_forearm_length" value="${-a3}" />
+        <xacro:property name="ur5_wrist_1_length" value="${d4 - ur5_elbow_offset - ur5_shoulder_offset}" />
+        <xacro:property name="ur5_wrist_2_length" value="${d5}" />
+        <xacro:property name="ur5_wrist_3_length" value="${d6}" />
+
+        <xacro:property name="ur5_shoulder_radius" value="0.060" />   <!-- manually measured -->
+        <xacro:property name="ur5_upper_arm_radius" value="0.054" />  <!-- manually measured -->
+        <xacro:property name="ur5_elbow_radius" value="0.060" />      <!-- manually measured -->
+        <xacro:property name="ur5_forearm_radius" value="0.040" />    <!-- manually measured -->
+        <xacro:property name="ur5_wrist_radius" value="0.045" />      <!-- manually measured -->
+
+        <!-- Arbitrary offsets for shoulder/elbow joints -->
+        <xacro:property name="ur5_shoulder_offset" value="0.13585" />  <!-- measured from model -->
+        <xacro:property name="ur5_elbow_offset" value="-0.1197" /> <!-- measured from model -->
+
+
+        <xacro:property name="ur5_shoulder_pan_joint_lower_limit" value="${-pi}"/> 
+        <xacro:property name="ur5_shoulder_pan_joint_upper_limit" value="${pi}"/>
+        <xacro:property name="ur5_shoulder_pan_joint_effort_limit" value="150.0"/>
+        <xacro:property name="ur5_shoulder_pan_joint_velocity_limit" value="3.15"/>
+        <xacro:property name="ur5_shoulder_lift_joint_lower_limit" value="${-pi}"/> 
+        <xacro:property name="ur5_shoulder_lift_joint_upper_limit" value="${pi}"/>
+        <xacro:property name="ur5_shoulder_lift_joint_effort_limit" value="150.0"/>
+        <xacro:property name="ur5_shoulder_lift_joint_velocity_limit" value="3.15"/>
+        <xacro:property name="ur5_elbow_joint_lower_limit" value="${-pi}"/>
+        <xacro:property name="ur5_elbow_joint_upper_limit" value="${pi}"/>
+        <xacro:property name="ur5_elbow_joint_effort_limit" value="150.0"/>
+        <xacro:property name="ur5_elbow_joint_velocity_limit" value="3.15"/>
+        <xacro:property name="ur5_wrist_1_lower_limit" value="${-pi}"/>
+        <xacro:property name="ur5_wrist_1_upper_limit" value="${pi}"/>
+        <xacro:property name="ur5_wrist_1_effort_limit" value="28"/>
+        <xacro:property name="ur5_wrist_1_velocity_limit" value="3.2"/>
+        <xacro:property name="ur5_wrist_2_lower_limit" value="${-pi}"/>
+        <xacro:property name="ur5_wrist_2_upper_limit" value="${pi}"/>
+        <xacro:property name="ur5_wrist_2_effort_limit" value="28"/>
+        <xacro:property name="ur5_wrist_2_velocity_limit" value="3.2"/>
+        <xacro:property name="ur5_wrist_3_lower_limit" value="${-pi}"/>
+        <xacro:property name="ur5_wrist_3_upper_limit" value="${pi}"/>
+        <xacro:property name="ur5_wrist_3_effort_limit" value="28"/>
+        <xacro:property name="ur5_wrist_3_velocity_limit" value="3.2"/>
+        
+        <xacro:property name="ur5_safety_limits" value="false"/>
+        <xacro:property name="ur5_safety_pos_margin" value="0.15"/>
+        <xacro:property name="ur5_safety_k_position" value="20"/>
+
+
+    <!-- ############################################# -->
+    <!-- ################# Properties ################ -->
+
+    <!-- #################### Macros ################### -->
+    <!-- ############################################### -->
+
+        <xacro:macro name="UR5_arm" params="parent">
+            
+            <joint name="UR5_base_joint_fixed" type="fixed">
+                <origin xyz="0.0 0.0 0.5" rpy="0.0 0.0 0.0" />
+                <parent link="${parent}"/>
+                <child link="UR5_base_link"/>
+            </joint>  
+
+            <link name="UR5_base_link" >
+                <visual>
+                    <geometry>
+                        <mesh filename="package://bullet_grasp_simulator/meshes/ur5_arm/visual/base.dae"/>
+                    </geometry>
+                    <material name="grey">
+                        <color rgba="0.5 0.5 0.5 1"/>
+                    </material>
+                </visual>
+                <collision>
+                    <geometry>
+                        <mesh filename="package://bullet_grasp_simulator/meshes/ur5_arm/collision/base.stl"/>
+                    </geometry>
+                </collision>
+                <xacro:cylinder_inertial radius="0.06" length="0.05" mass="${ur5_base_mass}">
+                    <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                </xacro:cylinder_inertial>
+            </link>
+
+            <joint name="UR5__base_to_shoulder_pan_joint" type="revolute">
+                <parent link="UR5_base_link" />
+                <child link = "UR5_shoulder_pan_link" />
+                <origin xyz="0.0 0.0 ${ur5_shoulder_height}" rpy="0.0 0.0 0.0" />
+                <axis xyz="0 0 1" />
+                <limit lower="${ur5_shoulder_pan_joint_lower_limit}" upper="${ur5_shoulder_pan_joint_upper_limit}" effort="${ur5_shoulder_pan_joint_effort_limit}" velocity="${ur5_shoulder_pan_joint_velocity_limit}"/>
+                <xacro:if value="${ur5_safety_limits}">
+                    <safety_controller soft_lower_limit="${ur5_shoulder_pan_joint_lower_limit + ur5_safety_pos_margin}" soft_upper_limit="${ur5_shoulder_pan_joint_upper_limit - ur5_safety_pos_margin}" k_position="${ur5_safety_k_position}" k_velocity="0.0"/>
+                </xacro:if>
+                <dynamics damping="0.0" friction="0.0"/>
+            </joint>
+
+            <link name="UR5_shoulder_pan_link">
+                <visual>
+                    <geometry>
+                        <mesh filename="package://bullet_grasp_simulator/meshes/ur5_arm/visual/shoulder.dae"/>
+                    </geometry>
+                    <material name="grey">
+                        <color rgba="0.5 0.5 0.5 1"/>
+                    </material>
+                </visual>
+                <collision>
+                    <geometry>
+                        <mesh filename="package://bullet_grasp_simulator/meshes/ur5_arm/collision/shoulder.stl"/>
+                    </geometry>
+                </collision>
+                <xacro:cylinder_inertial radius="0.06" length="0.15" mass="${ur5_shoulder_mass}">
+                    <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                </xacro:cylinder_inertial>
+            </link>
+
+            <joint name="UR5__shoulder_pan_to_upper_arm_joint" type="revolute">
+                <parent link="UR5_shoulder_pan_link" />
+                <child link = "UR5_upper_arm_link" />
+                <origin xyz="0.0 ${ur5_shoulder_offset} 0.0" rpy="0.0 0.0 0.0" />
+                <axis xyz="0 1 0" />
+                <limit lower="${ur5_shoulder_lift_joint_lower_limit}" upper="${ur5_shoulder_lift_joint_upper_limit}" effort="${ur5_shoulder_lift_joint_effort_limit}" velocity="${ur5_shoulder_lift_joint_velocity_limit}"/>
+                <xacro:if value="${ur5_safety_limits}">
+                    <safety_controller soft_lower_limit="${ur5_shoulder_lift_joint_lower_limit + ur5_safety_pos_margin}" soft_upper_limit="${ur5_shoulder_lift_joint_upper_limit - ur5_safety_pos_margin}" k_position="${ur5_safety_k_position}" k_velocity="0.0"/>
+                </xacro:if>
+                <dynamics damping="0.0" friction="0.0"/>
+            </joint>
+
+            <link name="UR5_upper_arm_link">
+                <visual>
+                    <geometry>
+                        <mesh filename="package://bullet_grasp_simulator/meshes/ur5_arm/visual/upperarm.dae"/>
+                    </geometry>
+                    <material name="grey">
+                        <color rgba="0.5 0.5 0.5 1"/>
+                    </material>
+                </visual>
+                <collision>
+                    <geometry>
+                        <mesh filename="package://bullet_grasp_simulator/meshes/ur5_arm/collision/upperarm.stl"/>
+                    </geometry>
+                </collision>
+		<xacro:cylinder_inertial radius="0.06" length="0.56" mass="${ur5_upper_arm_mass}">
+			<origin xyz="0.0 0.0 0.28" rpy="0 0 0" />
+		</xacro:cylinder_inertial>
+            </link>
+
+            <joint name="UR5__upper_arm_to_fore_arm_joint" type="revolute">
+                <parent link="UR5_upper_arm_link" />
+                <child link = "UR5_fore_arm_link" />
+                <origin xyz="0.0 ${ur5_elbow_offset} ${ur5_upper_arm_length}" rpy="0.0 0.0 0.0" />
+                <axis xyz="0 1 0" />
+                <limit lower="${ur5_elbow_joint_lower_limit}" upper="${ur5_elbow_joint_upper_limit}" effort="${ur5_shoulder_lift_joint_effort_limit}" velocity="${ur5_shoulder_lift_joint_velocity_limit}"/>
+                <xacro:if value="${ur5_safety_limits}">
+                    <safety_controller soft_lower_limit="${ur5_elbow_joint_lower_limit + ur5_safety_pos_margin}" soft_upper_limit="${ur5_elbow_joint_upper_limit - ur5_safety_pos_margin}" k_position="${ur5_safety_k_position}" k_velocity="0.0"/>
+                </xacro:if>
+                <dynamics damping="0.0" friction="0.0"/>
+            </joint>
+
+            <link name="UR5_fore_arm_link">
+                <visual>
+                    <geometry>
+                        <mesh filename="package://bullet_grasp_simulator/meshes/ur5_arm/visual/forearm.dae"/>
+                    </geometry>
+                    <material name="grey">
+                        <color rgba="0.5 0.5 0.5 1"/>
+                    </material>
+                </visual>
+                <collision>
+                    <geometry>
+                        <mesh filename="package://bullet_grasp_simulator/meshes/ur5_arm/collision/forearm.stl"/>
+                    </geometry>
+                </collision>
+                <xacro:cylinder_inertial radius="0.06" length="${-a3}" mass="${ur5_forearm_mass}">
+                    <origin xyz="0.0 0.0 ${-a3/2.0}" rpy="0 0 0" />
+                </xacro:cylinder_inertial>
+            </link>
+
+            <joint name="UR5__fore_arm_to_wrist_1_joint" type="revolute">
+                <parent link="UR5_fore_arm_link" />
+                <child link = "UR5_wrist_1_link" />
+                <origin xyz="0.0 0.0 ${ur5_forearm_length}" rpy="0.0 ${pi / 2.0} 0.0" />
+                <axis xyz="0 1 0" />
+                <limit lower="${ur5_wrist_1_lower_limit}" upper="${ur5_wrist_1_upper_limit}" effort="${ur5_wrist_1_effort_limit}" velocity="${ur5_wrist_1_velocity_limit}"/>
+                <xacro:if value="${ur5_safety_limits}">
+                    <safety_controller soft_lower_limit="${ur5_wrist_1_lower_limit + ur5_safety_pos_margin}" soft_upper_limit="${ur5_wrist_1_upper_limit - ur5_safety_pos_margin}" k_position="${ur5_safety_k_position}" k_velocity="0.0"/>
+                </xacro:if>
+                <dynamics damping="0.0" friction="0.0"/>
+            </joint>
+
+            <link name="UR5_wrist_1_link">
+                <visual>
+                    <geometry>
+                        <mesh filename="package://bullet_grasp_simulator/meshes/ur5_arm/visual/wrist1.dae"/>
+                    </geometry>
+                    <material name="grey">
+                        <color rgba="0.5 0.5 0.5 1"/>
+                    </material>
+                </visual>
+                <collision>
+                    <geometry>
+                        <mesh filename="package://bullet_grasp_simulator/meshes/ur5_arm/collision/wrist1.stl"/>
+                    </geometry>
+                </collision>
+                <xacro:cylinder_inertial radius="0.06" length="0.12" mass="${ur5_wrist_1_mass}">
+                    <origin xyz="0.0 ${ur5_wrist_1_length} 0.0" rpy="0 0 0" />
+                </xacro:cylinder_inertial>
+            </link>
+
+            <joint name="UR5__wrist_1_to_wrist_2_joint" type="revolute">
+                <parent link="UR5_wrist_1_link" />
+                <child link = "UR5_wrist_2_link" />
+                <origin xyz="0.0 ${ur5_wrist_1_length} 0.0" rpy="0.0 0.0 0.0"/>
+                <axis xyz="0 0 1" />
+                <limit lower="${ur5_wrist_2_lower_limit}" upper="${ur5_wrist_2_upper_limit}" effort="${ur5_wrist_2_effort_limit}" velocity="${ur5_wrist_2_velocity_limit}"/>
+                <xacro:if value="${ur5_safety_limits}">
+                    <safety_controller soft_lower_limit="${ur5_wrist_2_lower_limit + ur5_safety_pos_margin}" soft_upper_limit="${ur5_wrist_2_upper_limit - ur5_safety_pos_margin}" k_position="${ur5_safety_k_position}" k_velocity="0.0"/>
+                </xacro:if>
+                <dynamics damping="0.0" friction="0.0"/>
+            </joint>
+
+            <link name="UR5_wrist_2_link">
+                <visual>
+                    <geometry>
+                        <mesh filename="package://bullet_grasp_simulator/meshes/ur5_arm/visual/wrist2.dae"/>
+                    </geometry>
+                    <material name="grey">
+                        <color rgba="0.5 0.5 0.5 1"/>
+                    </material>
+                </visual>
+                <collision>
+                    <geometry>
+                        <mesh filename="package://bullet_grasp_simulator/meshes/ur5_arm/collision/wrist2.stl"/>
+                    </geometry>
+                </collision>
+                <xacro:cylinder_inertial radius="0.06" length="0.12" mass="${ur5_wrist_2_mass}">
+                    <origin xyz="0.0 0.0 ${ur5_wrist_2_length}" rpy="0 0 0" />
+                </xacro:cylinder_inertial>
+            </link>
+
+
+            <joint name="UR5__wrist_2_to_wrist_3_joint" type="revolute">
+                <parent link="UR5_wrist_2_link" />
+                <child link = "UR5_wrist_3_link" />
+                <origin xyz="0.0 0.0 ${ur5_wrist_2_length}" rpy="0.0 0.0 0.0" />
+                <axis xyz="0 1 0" />
+                <limit lower="${ur5_wrist_3_lower_limit}" upper="${ur5_wrist_3_upper_limit}" effort="${ur5_wrist_3_effort_limit}" velocity="${ur5_wrist_3_velocity_limit}"/>
+                <xacro:if value="${ur5_safety_limits}">
+                    <safety_controller soft_lower_limit="${ur5_wrist_3_lower_limit + ur5_safety_pos_margin}" soft_upper_limit="${ur5_wrist_3_upper_limit - ur5_safety_pos_margin}" k_position="${ur5_safety_k_position}" k_velocity="0.0"/>
+                </xacro:if>
+                <dynamics damping="0.0" friction="0.0"/>
+            </joint>
+
+            <link name="UR5_wrist_3_link">
+                <visual>
+                    <geometry>
+                        <mesh filename="package://bullet_grasp_simulator/meshes/ur5_arm/visual/wrist3.dae"/>
+                    </geometry>
+                    <material name="grey">
+                        <color rgba="0.5 0.5 0.5 1"/>
+                    </material>
+                </visual>
+                <collision>
+                    <geometry>
+                        <mesh filename="package://bullet_grasp_simulator/meshes/ur5_arm/collision/wrist3.stl"/>
+                    </geometry>
+                </collision>
+                <xacro:cylinder_inertial radius="0.0375" length="0.0345" mass="${ur5_wrist_3_mass}">
+                    <origin xyz="0.0 ${ur5_wrist_3_length - 0.0345/2} 0.0" rpy="${pi/2} 0 0" />
+                </xacro:cylinder_inertial>
+            </link>
+
+            <joint name="UR5__wrist_3_to_end_effector_joint_fixed" type="fixed">
+                <parent link="UR5_wrist_3_link" />
+                <child link = "UR5_end_effector_link" />
+                <origin xyz="0.0 ${ur5_wrist_3_length} 0.0" rpy="0.0 0.0 ${pi/2.0}" />
+            </joint>
+
+            <link name="UR5_end_effector_link">
+                <collision>
+                    <geometry>
+                        <box size="0.01 0.01 0.01"/>
+                    </geometry>
+                    <origin rpy="0 0 0" xyz="-0.01 0 0"/>
+                </collision>
+            </link>
+
+        </xacro:macro>
+ 
+    <!-- ############################################### -->
+    <!-- #################### Macros ################### -->
+
+</robot>

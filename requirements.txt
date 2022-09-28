@@ -29,3 +29,7 @@ snakeviz >= 2.1.0
 pytest >= 6.0.1
 pytest-cov >= 2.10.1
 pytest-benchmark >= 3.2.3
+
+git+https://github.com/Hadi-Hajieghrary/pybullet-object-models.git@master#egg=pybullet-object-models
+
+pysdf >= 0.1.8

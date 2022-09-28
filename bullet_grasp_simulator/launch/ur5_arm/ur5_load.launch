@@ -1,0 +1,21 @@
+
+<launch>
+
+  <!-- Load URDF -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find bullet_grasp_simulator)/urdf/ur5_arm/ur5_arm.urdf" />
+
+
+  <!-- Robot state publisher -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="20.0" />
+  </node>
+
+  <!-- Start joint_state_publisher is when we do not have a simulation or real robot. 
+       This is to generate fake value of the joint for Rviz to Visualize -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
+
+    
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find bullet_grasp_simulator)/config/rviz/ur5_arm/ur5_arm.rviz" />
+
+
+</launch>
